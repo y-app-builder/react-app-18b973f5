@@ -1,39 +1,100 @@
 import React, { useState } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0);
+interface Todo {
+  id: number;
+  text: string;
+  completed: boolean;
+}
 
-  const incrementCount = () => {
-    setCount(count + 1);
+function App() {
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [newTodo, setNewTodo] = useState('');
+
+  const addTodo = () => {
+    if (newTodo.trim()) {
+      const todo: Todo = {
+        id: Date.now(),
+        text: newTodo,
+        completed: false,
+      };
+      setTodos([...todos, todo]);
+      setNewTodo('');
+    }
+  };
+
+  const toggleTodo = (id: number) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const deleteTodo = (id: number) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '50px' }}>
-      <h1>Click Counter</h1>
-      <p style={{ fontSize: '24px', marginBottom: '20px' }}>You clicked {count} times</p>
-      <button
-        onClick={incrementCount}
-        style={{
-          padding: '10px 20px',
-          fontSize: '16px',
-          backgroundColor: '#800080', // Changed button color to purple
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          transition: 'transform 0.2s', // Added transition for smooth scaling
-        }}
-        onMouseEnter={(e) => {
-          const button = e.currentTarget;
-          button.style.transform = 'scale(1.1)'; // Scale up on hover
-        }}
-        onMouseLeave={(e) => {
-          const button = e.currentTarget;
-          button.style.transform = 'scale(1)'; // Reset scale on mouse leave
-        }}
-      >
-        Click Me
-      </button>
+      <h1>Todo List</h1>
+      <div style={{ display: 'flex', marginBottom: '20px' }}>
+        <input
+          type="text"
+          value={newTodo}
+          onChange={(e) => setNewTodo(e.target.value)}
+          placeholder="Enter a new todo"
+          style={{ padding: '10px', fontSize: '16px', marginRight: '10px' }}
+        />
+        <button
+          onClick={addTodo}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            backgroundColor: '#800080',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+          }}
+        >
+          Add Todo
+        </button>
+      </div>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {todos.map((todo) => (
+          <li
+            key={todo.id}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '10px',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() => toggleTodo(todo.id)}
+              style={{ marginRight: '10px' }}
+            />
+            <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>{todo.text}</span>
+            <button
+              onClick={() => deleteTodo(todo.id)}
+              style={{
+                marginLeft: 'auto',
+                padding: '5px 10px',
+                fontSize: '14px',
+                backgroundColor: '#ff0000',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
